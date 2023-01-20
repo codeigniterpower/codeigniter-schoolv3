@@ -15,7 +15,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 | If it is not set, then CodeIgniter will try guess the protocol and path
 | your installation, but due to security concerns the hostname will be set
-| to $_SERVER['SERVER_ADDR'] if available, or localhost otherwise.
+| to $_SERVER['SERVER_ADDR'] if available, or proxyweb.com otherwise.
 | The auto-detection mechanism exists only for convenience during
 | development and MUST NOT be used in production!
 |
@@ -23,8 +23,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-// $config['base_url'] = '';
-$config['base_url'] = 'http://localhost/schoolv3/';
+
+if ( strcmp('development',ENVIRONMENT) == 0)
+	$config['base_url'] = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http').'://' . $_SERVER['HTTP_HOST'] . str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
+else
+	$config['base_url'] = '@UNCONFIGUREDdomain.com@';
+
 
 /*
 |--------------------------------------------------------------------------
@@ -36,7 +40,7 @@ $config['base_url'] = 'http://localhost/schoolv3/';
 | variable so that it is blank.
 |
 */
-$config['index_page'] = '';
+$config['index_page'] = ''; // WARNING if set to blank check rewrite presence
 
 /*
 |--------------------------------------------------------------------------
@@ -224,7 +228,7 @@ $config['allow_get_array'] = TRUE;
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 0;
+$config['log_threshold'] = 4;
 
 /*
 |--------------------------------------------------------------------------

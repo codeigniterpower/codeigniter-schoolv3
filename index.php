@@ -56,13 +56,8 @@
  * NOTE: If you change these, also change the error_reporting() code below
  */
 
-require_once __DIR__.'/mvc/helpers/site_helper.php';
-
-
-if (!preg_match("/^(127\.0\.|10\.0\.).+/i", getIpAddress())) {
-    $_SERVER['CI_ENV'] = 'production';
-}
-
+if (is_file('./ENV_DEVEL')) $_SERVER['CI_ENV'] = 'development';
+if (is_file('./ENV_PROD')) $_SERVER['CI_ENV'] = 'production';
 
 define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 
@@ -78,7 +73,7 @@ switch (ENVIRONMENT)
 {
 	case 'development':
 		error_reporting(E_ALL);
-		ini_set('display_errors', 0);
+		ini_set('display_errors', 1);
 	break;
 
 	case 'testing':

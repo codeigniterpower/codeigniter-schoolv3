@@ -48,10 +48,10 @@
 $active_group = 'default';
 $active_record = TRUE;
 
-$db['default']['hostname'] = 'localhost';
-$db['default']['username'] = 'root';
-$db['default']['password'] = '';
-$db['default']['database'] = 'mdacademico';
+$db['default']['hostname'] = '127.0.0.1';
+$db['default']['username'] = '@databaseuser@';
+$db['default']['password'] = '@databasepass@';
+$db['default']['database'] = '@databasename@';
 $db['default']['dbdriver'] = 'mysqli';
 $db['default']['dbprefix'] = '';
 $db['default']['pconnect'] = FALSE;
