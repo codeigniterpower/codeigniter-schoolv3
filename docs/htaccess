@@ -1,0 +1,4 @@
+RewriteEngine on
+RewriteCond $1 !^(index\.php|assets|uploads|robots|\.txt)
+RewriteRule ^(.*)$ /escolar_pro/index.php?/$1 [L,QSA]
+
