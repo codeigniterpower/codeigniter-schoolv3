@@ -12,6 +12,7 @@ this works for any deb based distro (including Devuan or LMDE or other deb based
 apt-get --no-install-recommends -y install base-files lsb-release apt-transport-https
 
 cat > /etc/apt/sources.list.d/50venenux.list << EOF
+deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/lamp-vnx/Debian_$(lsb_release -rs|cut -d. -f1)/ /
 deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/deploy-vnx1/Debian_$(lsb_release -rs|cut -d. -f1)/ /
 deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/internet-vnx1/Debian_$(lsb_release -rs|cut -d. -f1)/ /
 deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/system-vnx1/Debian_$(lsb_release -rs|cut -d. -f1)/ /
@@ -78,6 +79,7 @@ Run those commands as `root` superuser:
 apt-get --no-install-recommends -y install base-files lsb-release apt-transport-https
 
 cat > /etc/apt/sources.list.d/50venenux.list << EOF
+deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/lamp-vnx/Debian_$(lsb_release -rs|cut -d. -f1)/ /
 deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/deploy-vnx1/Debian_$(lsb_release -rs|cut -d. -f1)/ /
 deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/internet-vnx1/Debian_$(lsb_release -rs|cut -d. -f1)/ /
 deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/system-vnx1/Debian_$(lsb_release -rs|cut -d. -f1)/ /
