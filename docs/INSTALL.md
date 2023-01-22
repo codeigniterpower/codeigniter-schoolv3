@@ -30,13 +30,13 @@ apt-get -y --force-yes install ca-certificates apt-transport-https \
 
 wget http://ftp.us.debian.org/debian/pool/main/a/adminer/adminer_4.8.1-1_all.deb
 
-apt install ./adminer_4.8.1-1_all.deb
+dpkg -i ./adminer_4.8.1-1_all.deb
 
-/sbin/a2dismod php7.4
-/sbin/a2enmod rewrite php5.6 userdir usertrack
-/sbin/a2enconf adminer
+/usr/sbin/a2dismod php7.3 php7.2 php7.1 php5.6 php8.0 php8.1
+/usr/sbin/a2enmod rewrite php7.4 userdir usertrack
+/usr/sbin/a2enconf adminer
 sed -s -i -r 's#php_admin_flag engine Off#php_admin_flag engine On#g' /etc/apache2/mods-available/php*.conf
-/sbin/service apache2 restart
+/usr/sbin/service apache2 restart
 ```
 
 Now get out of super user and run as normal user, we demand that the 
@@ -44,12 +44,22 @@ development user must be named `general` and their home must be `/home/general`
 
 ```
 mkdir /home/general/public_html && /home/general/public_html
+rm -rf /home/general/public_html/school
 git clone https://gitlab.com/codeigniterpower/codeigniter-schoolv3 /home/general/public_html/school
+
 touch /home/general/public_html/school/ENV_DEVEL
 rm -rf /home/general/public_html/school/ENV_PROD
+cp /home/general/public_html/school/docs/htaccess-devel /home/general/public_html/school/.htaccess
+
+mysql -u root -p -e "DROP DATABASE mdacademico;"
+
 mysql -u root -p -e "CREATE DATABASE mdacademico;"
+
 cat /home/general/public_html/school/docs/database.sql | mysql -u root -p mdacademico
 ```
+
+Here the `-p` argument means you should input tyhe DBMS password, but 
+if you are using mariadb and socket auth.. just remove it.
 
 The only vars that you must change are the DB user and password at
 the file `/home/general/public_html/school/mvc/config/development/database.php`
@@ -63,6 +73,8 @@ run the following command:
 ```
 echo "<?php echo phpinfo(); ?>" > /home/general/public_html/info.php
 ```
+
+To use the web database editor go to `http://localhost/adminer` and login to your mysql.
 
 # Deploy production
 
@@ -79,7 +91,6 @@ Run those commands as `root` superuser:
 apt-get --no-install-recommends -y install base-files lsb-release apt-transport-https
 
 cat > /etc/apt/sources.list.d/50venenux.list << EOF
-deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/lamp-vnx/Debian_$(lsb_release -rs|cut -d. -f1)/ /
 deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/deploy-vnx1/Debian_$(lsb_release -rs|cut -d. -f1)/ /
 deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/internet-vnx1/Debian_$(lsb_release -rs|cut -d. -f1)/ /
 deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/system-vnx1/Debian_$(lsb_release -rs|cut -d. -f1)/ /
@@ -134,10 +145,14 @@ systemctl daemon-reload
 
 rm /var/www/html/*
 wget -O school.tar.gz https://github.com/codeigniterpower/codeigniter-schoolv3/archive/3e2ac9037614d65a512f2bedacd13fc097bf041e.tar.gz
+
 tar xf school.tar.gz -C /var/www/html/
 mv /var/www/html/codeigniter-schoolv3* /var/www/html/school
 touch /var/www/html/school/ENV_PROD
+
+mysql -u root -p -e "DROP DATABASE mdacademico;"
 mysql -u root -p -e "CREATE DATABASE mdacademico;"
+
 cat /var/www/html/school/docs/database.sql | mysql -u root -p mdacademico
 ```
 
