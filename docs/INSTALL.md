@@ -80,10 +80,12 @@ To use the web database editor go to `http://localhost/adminer` and login to you
 
 Debian/Devuan based servers distros:
 
+### Preparation of server:
+
 1. install venenux repos to get sure php 5.6 exits on all debians
 2. install the necesary packages, must be apache2 due the rewrite rule
-3. setup the necesary environment to get sure will run secure
-4. setup the credentials and domain for base url in config files
+3. setup the php, mysql and apache instalations
+4. setup the timezone inside mysql and restart the daemons
 
 Run those commands as `root` superuser:
 
@@ -91,6 +93,7 @@ Run those commands as `root` superuser:
 apt-get --no-install-recommends -y install base-files lsb-release apt-transport-https
 
 cat > /etc/apt/sources.list.d/50venenux.list << EOF
+deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/lamp-vnx/Debian_$(lsb_release -rs|cut -d. -f1)/ /
 deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/deploy-vnx1/Debian_$(lsb_release -rs|cut -d. -f1)/ /
 deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/internet-vnx1/Debian_$(lsb_release -rs|cut -d. -f1)/ /
 deb [trusted=yes] http://download.opensuse.org/repositories/home:/vegnuli:/system-vnx1/Debian_$(lsb_release -rs|cut -d. -f1)/ /
@@ -126,10 +129,6 @@ sed -s -i -r 's#.*max_input_time =.*#max_input_time = 90#g' /etc/php/*/*/php.ini
 sed -s -i -r 's#.*default_socket_timeout =.*#default_socket_timeout = 90#g' /etc/php/*/*/php.ini
 /sbin/a2enmod rewrite php5.6
 echo "<?php echo phpinfo(); ?>" > /var/www/html/info.php
-/sbin/service apache2 restart
-
- mysql_tzinfo_to_sql /usr/share/zoneinfo/ | mysql -u root mysql -p
-
 mkdir -p /etc/systemd/system/mysql.service.d
 cat > /etc/systemd/system/mysql.service.d/percona.conf << EOF
 [Service]
@@ -141,19 +140,44 @@ mysql        soft    nofile           65535
 mysql        hard    nofile           65535
 EOF
 systemctl daemon-reload
+
+ mysql_tzinfo_to_sql /usr/share/zoneinfo/ | mysql -u root mysql -p
+
 /usr/sbin/service mysql restart
 
+/sbin/service apache2 restart
+```
+
+### Instalation of application
+
+1. get sure of duplication of files in place
+2. download the last commit with the web application
+3. uncompress the tarball downloaded
+4. move to the right place and define as production environment
+5. create database and the user by root user
+6. upload and fil the database using new DB user
+7. edit the file `production\database.php` and fill new credentials
+8. edit the file `config.php` change the `base_url` with domain url
+
+Run those commands as `root` superuser:
+
+```
 rm /var/www/html/*
-wget -O school.tar.gz https://github.com/codeigniterpower/codeigniter-schoolv3/archive/3e2ac9037614d65a512f2bedacd13fc097bf041e.tar.gz
+wget -O school.tar.gz https://gitlab.com/codeigniterpower/codeigniter-schoolv3/-/archive/33752a9b4006371a20985c172641b974028746e2/codeigniter-schoolv3-33752a9b4006371a20985c172641b974028746e2.tar.gz
 
 tar xf school.tar.gz -C /var/www/html/
 mv /var/www/html/codeigniter-schoolv3* /var/www/html/school
 touch /var/www/html/school/ENV_PROD
 
 mysql -u root -p -e "DROP DATABASE mdacademico;"
+
 mysql -u root -p -e "CREATE DATABASE mdacademico;"
 
-cat /var/www/html/school/docs/database.sql | mysql -u root -p mdacademico
+mysql -u root -p -e "CREATE USER 'mdacademico'@'127.0.0.1' IDENTIFIED BY PASSWORD 'clave'"
+
+mysql -u root -p -e "GRANT ALL PRIVILEGES ON `mdacademico`.* TO 'mdacademico'@'127.0.0.1' WITH GRANT OPTION;"
+
+cat /var/www/html/school/docs/database.sql | mysql -u mdacademico -pclave mdacademico
 ```
 
 **IMPORTANT** on `mysql` commands if you use socket auth mariadb, dont use `-p`.
