@@ -1,7 +1,8 @@
 # Como comenzar
 ===========================
 
-Este documento le indicara instrucciones de como comenzar desarrollar y que usar en este proyecto
+Este documento le indicara instrucciones de como comenzar desarrollar y que usar en este proyecto, 
+indicara las ventajas y desventajas y el entorno aproximado asi como las carencias.
 
 * [Como comenzar a trabajar](#como-comenzar-a-trabajar)
  * [1 Requisitos para trabajar](#1-requisitos-para-trabajar)
@@ -27,7 +28,7 @@ clonar el repo, iniciar y arrancar el editor Geany.***
 
 Todo esto se explica en detalle a continuacion por partes
 
-El sistema esta con uan base php en codeigniter 3 pero sin embargo tiene una logica 
+El sistema esta con una base php en codeigniter 3 pero sin embargo tiene una logica 
 de permisologia y dos naturalezas de usuario, significa que cada modulo no funciona 
 solo por invocarlo, debe pertenecer a una permisologia y el usuario debe estar asociado 
 a un perfil de permisologia, igualmente para el menu que se muestra.
@@ -43,6 +44,10 @@ medios del sistema asi como para las subidas de los usuarios.
 Sobre la forma de desarrollo en la seccion [Estructura de desarrollo](#estructura-de-desarrollo)
 se detallan las dificultades y logicas para empezar a trabajar.
 
+Lastimosamente muchas de esta logic ano se cumple completamente y poco esta documentado 
+adicional tiene un alto numero de librerias javascript donde algunas son server side 
+dificultando la vision de los request y response visualmente.
+
 ### 1 Requisitos para trabajar
 
 * sistema linux soportado: Debian: 7, 8, 9; Buntu 14, 16, 17, 18, 21; VenenuX 7, 8, 9; Devuan 1, 2, 5
@@ -51,7 +56,7 @@ se detallan las dificultades y logicas para empezar a trabajar.
 * mysql (manejador y servidor DB que hara de pivote) `apt-get install mysql-client mysql-server` (no hacer si tiene percona)
 * odbc, myodbc, freetds (coneccion DB mysql, ODBC para sybase y mssql) `apt-get install tdsodbc`
 * geany (editor para manejo php asi como ver el preview) `apt-get install geany geany-plugin-webhelper`
-* lighttpd (webserver localmente para trabajar el webview) `apt-get install lighttpd`
+* apache2 (webserver localmente para trabajar el webview) `apt-get install apache2
 * php (interprete) en debian/buntu `apt-get install php-cgi php-mysql php-odbc php-gd php-mcrypt php-curl`
 * curl (invocar urls) `apt-get install curl`
 
@@ -113,6 +118,9 @@ una gran cantidad de librerias javascrip, y muchas llamadas server side.
 Esta es la mayor desventaja de este proyecto requiriendo que el perfil 
 de desarrollo sea forzosamente alguien muy costoso.
 
+Tiene un alto numero de librerias javascript donde algunas son server side 
+dificultando la vision de los request y response visualmente.
+
 ## Codigo y fuentes
 
 El directorio [mvc](mvc) contiene el codigo fuente del sistema, 
@@ -122,6 +130,15 @@ abajo se describe cada uno y como comenzar de ultimo.
 En el directorio [docs](docs) esta el archivo `database.sql` el cual habra cargado 
 esto en el servidor localhost de la maquina instalado en "localhost" y especificar o 
 corregir la conexcion en el archivo `mvc/config/*/database.php` del grupo correspondiente
+
+**El proyecto originalmente era una vil copia de otro proyecto que tambien fue uan vil copia, 
+tenia un instalador que practicamente no servia para nada ya que solo copiaba 
+un archivo con las credenciales modificadas, y para todo esto lo hacia muy mal.**
+
+## enrutamiento
+
+El proyecto emplea innecesariamente reescritura de la url (mod rewrite) forzando emplear 
+el software apache2 el cual es el mas pesado e ineficiente.
 
 ### medias, Javascripts y CSS
 
@@ -137,11 +154,15 @@ El directorio contiene el modelo, imagenes y scripts SQL,
 se usa una DB central que actualiza la tablas de usuarios y modulos, y 
 se conecta a sybase para obtener los datos de reportes. (Esto en un futuro)
 
-* base de datos MySQL/MariaDB, Sybase. Se emplea MySQL solo para pintar los reportes en tablas al vuelo.
+* base de datos MySQL/MariaDB. Se emplea MySQL solo porque es lo que los windoseros saben usar.
 * modelado de datos en mysqlworkbench formato script STANDARD usuario no especificado
 * formato tablas en pares cabecera/detalle como maximo la tabla detalle incluye el nombre cabecera separado por `_`
 * no hay llaves foraneas, integracion de los datos viene data por la aplicacion, puesto se maneja otras db
 * no hay llaves foraneas, permitiendo la manipulacion de los datos para modularizacion y flexibilidad
+
+El modelo de datos esta en el directorio [docs](docs) pero este solo especifica la 
+estructura de tablas y datos no el usuario ni permisologia para evitar problemas con 
+los distintos sabores de MySQL y versiones.
 
 Para iniciar una conexcion en un php dentro del framework sera asi en un controlador, vista o modelo:
 
@@ -176,7 +197,7 @@ el codeigniter, y el directorio "appsys" el lo mismo que el directorio "system" 
 
 Los **Modulos** seran sub directorios dentro del directorio de controladores, 
 cada sub directorio sera un modulo del sistema, y dentro cada clase controller 
-sera una llamada web url, ademas de los que ya esten en el directorio `elalmacenwebweb/controllers` 
+sera una llamada web url, ademas de los que ya esten en el directorio
 que tambien seran una llamada web url.
 
 El **Menu** es un sistema traido desde la base de datos, desde la tabla menus y cada entrada 
@@ -219,9 +240,6 @@ git push
 En la sucesion de comandos se trajo todo trabajo realizado en los submodulos 
 y actualiza "su marca" en el principal, despues que tiene todo a lo ultimo coordinado 
 se edita un archivo nuevo y se acomete
-
-**IMPORTANTE** Geany debe tener los plugins addons y filetree cargados y activados 
-en caso contrario debe leer y hacer lo que esta en el documento de https://proyectos.tijerazo.net/soporte/manuales-maquinas-linux
 
 
 # Logica aplicacion web
